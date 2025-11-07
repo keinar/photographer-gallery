@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
-
+const cors = require('cors');
 
 dotenv.config();
 connectDB();
@@ -10,6 +10,10 @@ connectDB();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(cors({
+  origin: 'http://localhost:5173'
+}));
 
 app.get('/', (req, res) => {
     res.send('API is running...');
