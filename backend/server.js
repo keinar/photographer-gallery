@@ -2,7 +2,9 @@ const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
+const galleryRoutes = require('./routes/galleryRoutes');
 const cors = require('cors');
+
 
 dotenv.config();
 connectDB();
@@ -20,6 +22,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/galleries', galleryRoutes);
 
 const PORT = process.env.PORT || 5001;
 
