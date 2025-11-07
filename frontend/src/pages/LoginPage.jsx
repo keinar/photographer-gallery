@@ -1,9 +1,17 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
+    if(localStorage.getItem('user')) {
+        navigate('/dashboard');
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,7 +22,9 @@ function LoginPage() {
                 { email, password }
             );
             console.log('Login successful:', response.data);
-            alert('Login successful! Check console for details.');
+            login(response.data);
+            alert('Login successful!');
+            navigate('/dashboard');
         } catch (error) {
             console.error('Login failed:', error);
             const message = error.response?.data?.message || 'Login failed. Please try again.';
