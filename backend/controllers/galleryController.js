@@ -66,6 +66,20 @@ const uploadImagesToGallery = asyncHandler(async (req, res) => {
     });
 });
 
+// desc Get gallery by secret link
+// route GET /api/gallery/link/:secretLink
+// access Public
+const getGalleryBySecretLink = asyncHandler(async (req, res) => {
+    const gallery = await Gallery.findOne({ secretLink: req.params.secretLink });
+
+    if (!gallery) {
+        res.status(404);
+        throw new Error('Gallery not found or invalid link');
+    }
+
+    res.status(200).json(gallery);
+});
+
 // desc Get galleries for user
 // route GET /api/gallery
 // access Private
@@ -79,4 +93,5 @@ module.exports = {
   createGallery,
   uploadImagesToGallery,
   getGalleriesForUser,
+  getGalleryBySecretLink,
 };

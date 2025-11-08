@@ -61,9 +61,13 @@ function DashboardPage() {
     }
 };
 
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   return (
     <div>
-      <h1>Welcome to your Dashboard, {user ? user.name : 'Guest'}!</h1>
+      <h1>Welcome to your Dashboard, {user ? capitalizeFirstLetter(user.name) : 'Guest'}!</h1>
       <p>This page is protected.</p>
       <button onClick={handleLogout}>Logout</button>
       <hr/>
@@ -102,10 +106,10 @@ function DashboardPage() {
             <div style={{display: 'flex', flexDirection:'column', gap: '1rem'}}>
                 {!listLoading && galleries.map((gallery) => (
                     <div key={gallery._id} style={{ border: '1px solid black', padding: '1rem' }}>
-                        <h3>{gallery.title}</h3>
-                        <p>Client: {gallery.clientName || 'N/A'}</p>
+                        <h3>{capitalizeFirstLetter(gallery.title)}</h3>
+                        <p>Client: {capitalizeFirstLetter(gallery.clientName) || 'N/A'}</p>
                         <p>Images: {gallery.images.length}</p>
-                        <p>Link: {gallery.secretLink}</p>
+                        <p>Link: <a href={`/gallery/${gallery.secretLink}`} target="_blank" rel="noopener noreferrer">{gallery.secretLink}</a></p>
 
                         <ImageUploader 
                             galleryId={gallery._id} 
