@@ -66,7 +66,17 @@ const uploadImagesToGallery = asyncHandler(async (req, res) => {
     });
 });
 
+// desc Get galleries for user
+// route GET /api/gallery
+// access Private
+const getGalleriesForUser = asyncHandler(async (req, res) => {
+    const galleries = await Gallery.find({ user: req.user._id });
+    res.status(200).json(galleries);
+}
+);
+
 module.exports = {
   createGallery,
   uploadImagesToGallery,
+  getGalleriesForUser,
 };

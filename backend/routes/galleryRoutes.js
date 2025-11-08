@@ -3,12 +3,15 @@ const router = express.Router();
 const {
   createGallery,
   uploadImagesToGallery,
+  getGalleriesForUser,
 } = require('../controllers/galleryController.js');
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
 
-router.route('/').post(protect, createGallery);
+router.route('/')
+  .get(protect, getGalleriesForUser)
+  .post(protect, createGallery);
 
 router
   .route('/:id/upload')
