@@ -36,10 +36,11 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
                     },
                 }
             );
-            
+
             alert(response.data.message);
             setLoading(false);
             setFiles(null);
+            e.target.reset();
             if (onUploadSuccess) {
                 onUploadSuccess();
             }
@@ -50,19 +51,31 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
             setLoading(false);
         }
     };
-    
+
     return (
-        <form onSubmit={handleSubmit} style={{ marginTop: '1rem', border: '1px dashed #ccc', padding: '0.5rem' }}>
-            <h4>Upload Images</h4>
-            <input
-                type="file"
-                multiple
-                onChange={handleFileChange}
-            />
-            <button type="submit" disabled={loading}>
-            {loading ? 'Uploading...' : 'Upload Images'}
-            </button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+        <form onSubmit={handleSubmit} className="mt-4 border-t border-gray-200 pt-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Upload More Images</h4>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+                <input
+                    type="file"
+                    multiple
+                    onChange={handleFileChange}
+                    className="block w-full text-sm text-gray-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-md file:border-0
+            file:text-sm file:font-semibold
+            file:bg-blue-50 file:text-blue-700
+            hover:file:bg-blue-100
+          "
+                />
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-2 sm:mt-0 w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline disabled:bg-gray-400">
+                    {loading ? 'Uploading...' : 'Upload'}
+                </button>
+            </div>
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
         </form>
     );
 }

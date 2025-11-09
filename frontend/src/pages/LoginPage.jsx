@@ -23,7 +23,7 @@ function LoginPage() {
         
        try {
             const response = await axios.post(
-                'http://localhost:5001/api/users/login', 
+                '/api/users/login', 
                 { email, password }
             );
             login(response.data);
