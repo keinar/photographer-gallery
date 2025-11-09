@@ -11,11 +11,12 @@ const {
 } = require('../controllers/galleryController.js');
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
-
+const validate = require('../middleware/validateMiddleware');
+const { createGallerySchema } = require('../validation/gallerySchemas');
 
 router.route('/')
   .get(protect, getGalleriesForUser)
-  .post(protect, createGallery);
+  .post(validate(createGallerySchema), protect, createGallery);
 
 router.route('/public/:secretLink')
   .get(getGalleryBySecretLink);
