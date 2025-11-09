@@ -74,7 +74,6 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
                     {loading ? 'Uploading...' : 'Upload'}
                 </button>
             </div>
-            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
         </form>
     );
 }

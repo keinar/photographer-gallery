@@ -1,16 +1,114 @@
-# React + Vite
+# 📸 Photographer's Gallery CMS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> A complete Full-Stack MERN application for photographers to securely manage and deliver photo galleries.
 
-Currently, two official plugins are available:
+## 🚀 Live Demo
+https://photo-gallery.keinar.com
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🖼️ Project Preview
+![alt text](image.png)
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📖 About This Project
+This project provides a self-hosted, professional platform for photographers to deliver client galleries with secure access, cloud image hosting, and an admin dashboard.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ✨ Key Features
+- Secure admin authentication with JWT
+- Protected backend and frontend routes
+- Profile management for the admin
+- Gallery CRUD with unique, secret shareable links
+- Cloudinary for image storage and Multer for uploads
+- "Download All" generates a ZIP on-the-fly for clients
+- Tailwind CSS frontend and responsive galleries
+
+---
+
+## 🛠️ Tech Stack
+- Frontend: React, React Router, Tailwind CSS, React Toastify, Axios
+- Backend: Node.js, Express.js
+- Database: MongoDB (Mongoose)
+- Auth: JWT, bcrypt.js
+- Storage: Cloudinary
+- Uploads: Multer
+- ZIP: JSZip
+
+---
+
+## 🚀 Getting Started (Local Setup)
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- MongoDB Atlas or local MongoDB
+- Cloudinary account
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/keinar/photographer-gallery.git
+cd photographer-gallery
+```
+
+### 2. Backend setup
+```bash
+cd backend
+npm install
+```
+Create a `.env` file in the backend directory with:
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_key
+CLOUDINARY_API_SECRET=your_cloudinary_secret
+PORT=5001
+```
+Run the backend:
+```bash
+npm run dev
+```
+
+### 3. Frontend setup
+Open a new terminal:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Frontend dev server typically runs at: http://localhost:5173
+
+---
+
+## 4. Create an Admin User
+Use Postman, Thunder Client, or curl to create a first admin user.
+
+Example curl:
+```bash
+curl -X POST http://localhost:5001/api/users/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Your Name","email":"admin@example.com","password":"your-secure-password"}'
+```
+
+After registering, log in on the frontend to obtain access to the admin dashboard.
+
+---
+
+## 📦 Deployment Notes
+- Backend can be deployed on cPanel's Node.js selector or any Node-compatible host.
+- Ensure environment variables are set in your hosting environment.
+- Cloudinary credentials must be kept secret.
+
+---
+
+## 🔧 Troubleshooting
+- If API calls fail, check backend logs and ensure the backend port matches the frontend API base URL.
+- Verify Cloudinary credentials and that images upload/delete correctly.
+
+---
+
+## ❤️ Contributing
+Contributions, bug reports, and feature requests are welcome. Please open an issue or PR on the repository.
+
+---

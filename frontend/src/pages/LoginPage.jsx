@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -7,14 +7,15 @@ import { toast } from "react-toastify";
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const navigate = useNavigate();
-
     const [loading, setLoading] = useState(false);
 
-    if(localStorage.getItem('user')) {
-        navigate('/dashboard');
-    }
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,7 +24,7 @@ function LoginPage() {
         
        try {
             const response = await axios.post(
-                '/api/users/login', 
+                'https://photo-gallery.keinar.com/api/users/login', 
                 { email, password }
             );
             login(response.data);
@@ -66,9 +67,6 @@ function LoginPage() {
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                     />
                 </div>
-                {error && (
-                    <p className="text-red-500 text-xs italic mb-4">{error}</p>
-                )}
                 <div className="flex items-center justify-between">
                     <button
                         type="submit"

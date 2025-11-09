@@ -7,6 +7,7 @@ function GalleryPage() {
     const { secretLink } = useParams();
     const [gallery, setGallery] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const API_URL = '/api';
 
@@ -19,6 +20,7 @@ function GalleryPage() {
             } catch (err) {
                 console.error('Error fetching gallery:', err);
                 toast.error('Gallery not found or invalid link.');
+                setError('Gallery not found or invalid link.');
             } finally {
                 setLoading(false);
             }

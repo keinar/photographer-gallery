@@ -97,9 +97,6 @@ function ProfilePage() {
             />
           </div>
 
-          {error && <p className="text-red-500 text-xs">{error}</p>}
-          {success && <p className="text-green-500 text-xs">{success}</p>}
-
           <div className="flex flex-col sm:flex-row gap-4">
             <Link 
               to="/dashboard"

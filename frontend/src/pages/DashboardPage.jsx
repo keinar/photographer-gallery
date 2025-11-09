@@ -33,10 +33,6 @@ function DashboardPage() {
     fetchGalleries();
   }, []);
 
-  useEffect(() => {
-  if (!user) navigate('/login');
-}, [user]);
-
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -72,12 +68,12 @@ function DashboardPage() {
 
     try {
       await api.delete(`/galleries/${galleryId}`);
-      alert('Gallery deleted successfully!');
+      toast.success('Gallery deleted successfully!');
       fetchGalleries();
     } catch (err) {
       console.error('Error deleting gallery:', err);
       const message = err.response?.data?.message || 'Failed to delete gallery. Please try again.';
-      alert(message);
+      toast.error(message);
     }
   };
 
@@ -88,17 +84,21 @@ function DashboardPage() {
 
     try {
       await api.delete(`/galleries/${galleryId}/image`, { data: { publicId: imagePublicId } });
-      alert('Image deleted successfully!');
+      toast.success('Image deleted successfully!');
       fetchGalleries();
     } catch (err) {
       console.error('Error deleting image:', err);
       const message = err.response?.data?.message || 'Failed to delete image. Please try again.';
-      alert(message);
+      toast.error(message);
     }
   };
 
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
@@ -139,7 +139,7 @@ function DashboardPage() {
               <div>
                 <label htmlFor="clientName" className="block text-sm font-medium text-gray-700">
                   Client Name (Optional)
-                </label>                
+                </label>
                 <input
                   type="text"
                   id="clientName"
@@ -154,7 +154,6 @@ function DashboardPage() {
               >
                 {loading ? 'Creating...' : 'Create Gallery'}
               </button>
-              {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
             </form>
           </div>
         </aside>
