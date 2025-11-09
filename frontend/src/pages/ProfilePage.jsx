@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function ProfilePage() {
   const { user, login } = useAuth();
@@ -10,18 +11,13 @@ function ProfilePage() {
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
 
     if (password && password !== confirmPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
@@ -34,17 +30,16 @@ function ProfilePage() {
       }
 
       const response = await api.put('/users/profile', payload);
-
       login(response.data);
 
-      setSuccess('Profile updated successfully!');
+      toast.success('Profile updated successfully!');
       setLoading(false);
       setPassword(''); 
       setConfirmPassword('');
 
     } catch (err) {
       const message = err.response?.data?.message || 'Failed to update profile';
-      setError(message);
+      toast.error(message);
       setLoading(false);
     }
   };

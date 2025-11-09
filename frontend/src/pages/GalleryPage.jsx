@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../services/api';
+import { toast } from 'react-toastify';
 
 function GalleryPage() {
     const { secretLink } = useParams();
     const [gallery, setGallery] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     const API_URL = '/api';
 
@@ -18,7 +18,7 @@ function GalleryPage() {
                 setGallery(response.data);
             } catch (err) {
                 console.error('Error fetching gallery:', err);
-                setError('Gallery not found or invalid link.');
+                toast.error('Gallery not found or invalid link.');
             } finally {
                 setLoading(false);
             }

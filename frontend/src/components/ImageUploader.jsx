@@ -1,10 +1,10 @@
 import { useState } from "react";
 import api from '../services/api';
+import { toast } from 'react-toastify';
 
 function ImageUploader({ galleryId, onUploadSuccess }) {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     const handleFileChange = (e) => {
         setFiles(e.target.files);
@@ -13,12 +13,11 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!files || files.length === 0) {
-            setError('Please select files to upload.');
+            toast.error('Please select files to upload.');
             return;
         }
 
         setLoading(true);
-        setError(null);
 
         const formData = new FormData();
 
@@ -47,7 +46,7 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
         } catch (err) {
             console.error('Error uploading images:', err);
             const message = err.response?.data?.message || 'Failed to upload images. Please try again.';
-            setError(message);
+            toast.error(message);
             setLoading(false);
         }
     };

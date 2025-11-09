@@ -4,6 +4,7 @@ import api from '../services/api';
 import { useState, useEffect } from 'react';
 import ImageUploader from '../components/ImageUploader';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function DashboardPage() {
   const { user, logout } = useAuth();
@@ -12,7 +13,6 @@ function DashboardPage() {
   const [title, setTitle] = useState('');
   const [clientName, setClientName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [galleries, setGalleries] = useState([]);
   const [listLoading, setListLoading] = useState(true);
 
@@ -23,7 +23,7 @@ function DashboardPage() {
       setGalleries(response.data);
     } catch (err) {
       console.error('Error fetching galleries:', err);
-      alert('Failed to load galleries. Please try again.');
+      toast.error('Failed to load galleries. Please try again.');
     } finally {
       setListLoading(false);
     }
@@ -45,22 +45,21 @@ function DashboardPage() {
   const handleCreateGallery = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    toast.dismiss();
 
     try {
       const response = await api.post('/galleries', {
         title,
         clientName
       });
-      alert('Gallery created successfully!');
+      toast.success('Gallery created successfully!');
       setTitle('');
       setClientName('');
       fetchGalleries();
     } catch (err) {
       console.error('Error creating gallery:', err);
       const message = err.response?.data?.message || 'Failed to create gallery. Please try again.';
-      setError(message);
-      alert(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

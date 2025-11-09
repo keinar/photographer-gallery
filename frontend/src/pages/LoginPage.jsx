@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from "react-toastify";
 
 function LoginPage() {
     const [email, setEmail] = useState("");
@@ -10,7 +11,6 @@ function LoginPage() {
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     if(localStorage.getItem('user')) {
         navigate('/dashboard');
@@ -19,7 +19,7 @@ function LoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
+        toast.dismiss();
         
        try {
             const response = await axios.post(
@@ -31,7 +31,7 @@ function LoginPage() {
         } catch (error) {
             console.error('Login failed:', error);
             const message = error.response?.data?.message || 'Login failed. Please try again.';
-            setError(message);
+            toast.error(message);
         } finally {
             setLoading(false);
         }
