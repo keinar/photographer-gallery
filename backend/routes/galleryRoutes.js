@@ -5,6 +5,9 @@ const {
   uploadImagesToGallery,
   getGalleriesForUser,
   getGalleryBySecretLink,
+  deleteGalleryById,
+  deleteImageFromGallery,
+  downloadGalleryAsZip
 } = require('../controllers/galleryController.js');
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -14,11 +17,20 @@ router.route('/')
   .get(protect, getGalleriesForUser)
   .post(protect, createGallery);
 
+router.route('/public/:secretLink')
+  .get(getGalleryBySecretLink);
+
+router.route('/public/:secretLink/download')
+  .get(downloadGalleryAsZip);
+
+router.route('/:id')
+  .delete(protect, deleteGalleryById);
+
 router
   .route('/:id/upload')
   .post(protect, upload.array('images', 10), uploadImagesToGallery);
 
-router.route('/public/:secretLink')
-  .get(getGalleryBySecretLink);
+router.route('/:galleryId/image')
+  .delete(protect, deleteImageFromGallery);
 
 module.exports = router;

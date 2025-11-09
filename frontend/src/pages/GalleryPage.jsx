@@ -15,6 +15,8 @@ const ImageStyle = {
     objectFit: 'cover',
 };
 
+const API_URL = 'http://localhost:5001/api';
+
 function GalleryPage() {
     const { secretLink } = useParams();
     const [gallery, setGallery] = useState(null);
@@ -55,25 +57,53 @@ function GalleryPage() {
     }
 
     return (
-    <div style={{ padding: '1rem' }}>
-      <h2>{capitalizeFirstLetter(gallery.title)}</h2>
-      <p>For {capitalizeFirstLetter(gallery.clientName) || 'our valued client'}</p>
+        <div style={{ padding: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h2>{capitalizeFirstLetter(gallery.title)}</h2>
+                    <p>For {capitalizeFirstLetter(gallery.clientName) || 'our valued client'}</p>
+                </div>
 
-      <hr />
+                {gallery.images.length > 0 && (
+                    <a
+                        href={`${API_URL}/galleries/public/${secretLink}/download`}
+                        download
+                        style={{
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '5px',
+                            textDecoration: 'none',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        Download All
+                    </a>
+                )}
 
-      <div style={GalleryStyle}>
-        {gallery.images.length === 0 ? (
-          <p>Images are not ready yet. Please check back later.</p>
-        ) : (
-          gallery.images.map((image) => (
-            <div key={image._id}>
-              <img src={image.url} alt={image.fileName} style={ImageStyle} />
             </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
+
+            <hr />
+            <div style={{ padding: '1rem' }}>
+                <h2>{capitalizeFirstLetter(gallery.title)}</h2>
+                <p>For {capitalizeFirstLetter(gallery.clientName) || 'our valued client'}</p>
+
+                <hr />
+
+                <div style={GalleryStyle}>
+                    {gallery.images.length === 0 ? (
+                        <p>Images are not ready yet. Please check back later.</p>
+                    ) : (
+                        gallery.images.map((image) => (
+                            <div key={image._id}>
+                                <img src={image.url} alt={image.fileName} style={ImageStyle} />
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default GalleryPage;
