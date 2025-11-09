@@ -11,7 +11,7 @@ const validate = (schema) => asyncHandler(async (req, res, next) => {
     } catch (err) {
         res.status(400).json({
             message: 'Validation Error',
-            errors: err.errors,
+            errors: err.errors.map(e => e.message),
         });
     }
 });

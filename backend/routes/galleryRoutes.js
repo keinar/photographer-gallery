@@ -11,7 +11,7 @@ const {
 } = require('../controllers/galleryController.js');
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
-const validate = require('../middleware/validateMiddleware');
+const { validate } = require('../middleware/validateMiddleware');
 const { createGallerySchema } = require('../validation/gallerySchemas');
 
 router.route('/')
