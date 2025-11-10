@@ -53,9 +53,17 @@ function DashboardPage() {
       setClientName('');
       fetchGalleries();
     } catch (err) {
-      console.error('Error creating gallery:', err);
-      const message = err.response?.data?.message || 'Failed to create gallery. Please try again.';
-      toast.error(message);
+      console.error('Error creating gallery:', err.response.data);
+      // Check if this is a Zod validation error
+      if (err.response?.data?.errors) {
+        // Get the first error message from the Zod array
+        const zodErrorMessage = err.response.data.errors[0].message;
+        toast.error(zodErrorMessage);
+      } else {
+        // Fallback for other types of errors
+        const message = err.response?.data?.message || 'Failed to create gallery. Please try again.';
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }
