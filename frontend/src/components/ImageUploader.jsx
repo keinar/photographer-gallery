@@ -57,6 +57,7 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
             <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
                 <input
                     type="file"
+                    id="imageUploadInput"
                     multiple
                     onChange={handleFileChange}
                     className="block w-full text-sm text-gray-500
@@ -69,6 +70,7 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
                 />
                 <button
                     type="submit"
+                    id="uploadButton"
                     disabled={loading}
                     className="mt-2 sm:mt-0 w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline disabled:bg-gray-400">
                     {loading ? 'Uploading...' : 'Upload'}

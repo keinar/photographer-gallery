@@ -117,11 +117,13 @@ function DashboardPage() {
         <div className="flex gap-4">
           <Link
             to="/profile"
+            id="editProfileButton"
             className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-md shadow-sm"
           >
             Edit Profile
           </Link>
           <button
+            id="logoutButton"
             onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline"
           >
@@ -138,6 +140,7 @@ function DashboardPage() {
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700">Gallery Title</label>
                 <input
                   type="text"
+                  id="galleryTitle"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -157,6 +160,7 @@ function DashboardPage() {
               </div>
               <button
                 type="submit"
+                id="createGalleryButton"
                 disabled={loading}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline disabled:bg-gray-400"
               >
@@ -178,6 +182,7 @@ function DashboardPage() {
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="text-xl font-semibold text-gray-900">{gallery.title}</h3>
                     <button
+                      id={`deleteGalleryButton-${gallery._id}`}
                       onClick={() => handleDeleteGallery(gallery._id, gallery.title)}
                       className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-2 rounded-md focus:outline-none"
                     >
@@ -185,8 +190,8 @@ function DashboardPage() {
                     </button>
                   </div>
                   <div className="text-sm text-gray-600 space-y-1">
-                    <p><span className="font-medium">Client:</span> {gallery.clientName || 'N/A'}</p>
-                    <p><span className="font-medium">Public Link:</span>
+                    <p><span className="font-medium" id={`clientName-${gallery._id}`}>Client:</span> {gallery.clientName || 'N/A'}</p>
+                    <p><span className="font-medium" id={`publicLink-${gallery._id}`}>Public Link:</span>
                       <a href={`/gallery/${gallery.secretLink}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
                         /gallery/{gallery.secretLink}
                       </a>
@@ -199,11 +204,13 @@ function DashboardPage() {
                       {gallery.images.map((image) => (
                         <div key={image._id} className="relative group">
                           <img
+                            id={`image-${image._id}`}
                             src={image.url}
                             alt={image.fileName}
                             className="w-full h-20 sm:h-24 object-cover rounded-md"
                           />
                           <button
+                            id={`deleteImageButton-${image._id}`}
                             onClick={() => handleDeleteImage(gallery._id, image.public_id, image.fileName)}
                             className="absolute top-0 right-0 m-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold opacity-50 group-hover:opacity-100 transition-opacity"
                           >
