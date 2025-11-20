@@ -203,12 +203,21 @@ function DashboardPage() {
                     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2">
                       {gallery.images.map((image) => (
                         <div key={image._id} className="relative group">
-                          <img
-                            id={`image-${image._id}`}
-                            src={image.url}
-                            alt={image.fileName}
-                            className="w-full h-20 sm:h-24 object-cover rounded-md"
-                          />
+                          {image.resourceType === 'video' ? (
+                            <video
+                                id={`media-${image._id}`}
+                                src={image.url}
+                                controls
+                                className="w-full h-20 sm:h-24 object-cover rounded-md"
+                            />
+                          ) : (
+                            <img
+                                id={`media-${image._id}`}
+                                src={image.url}
+                                alt={image.fileName}
+                                className="w-full h-20 sm:h-24 object-cover rounded-md"
+                            />
+                          )}
                           <button
                             id={`deleteImageButton-${image._id}`}
                             onClick={() => handleDeleteImage(gallery._id, image.public_id, image.fileName)}

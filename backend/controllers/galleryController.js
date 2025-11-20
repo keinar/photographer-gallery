@@ -45,14 +45,19 @@ const uploadImagesToGallery = asyncHandler(async (req, res) => {
 
     for (const file of req.files) {
         try {
+            const isVideo = file.mimetype.startsWith('video/');
+            const resourceType = isVideo ? 'video' : 'auto';
+
             const result = await cloudinary.uploader.upload(file.path, {
                 folder: `photographer_gallery/${gallery._id}`,
+                resource_type: resourceType,
             });
 
             uploadedImages.push({
                 url: result.secure_url,
                 public_id: result.public_id,
                 fileName: file.originalname,
+                resourceType: result.resource_type,
             });
         } catch (error) {
             console.error('Error uploading to Cloudinary:', error);

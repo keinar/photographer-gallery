@@ -85,11 +85,20 @@ function GalleryPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {gallery.images.map((image) => (
               <div key={image._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <img 
-                  src={image.url} 
-                  alt={image.fileName} 
-                  className="w-full h-64 object-cover" 
-                />
+                {image.resourceType === 'video' ? (
+                    <video 
+                        src={image.url} 
+                        alt={image.fileName} 
+                        controls 
+                        className="w-full h-64 object-cover" 
+                    />
+                ) : (
+                    <img 
+                        src={image.url} 
+                        alt={image.fileName} 
+                        className="w-full h-64 object-cover" 
+                    />
+                )}
               </div>
             ))}
           </div>

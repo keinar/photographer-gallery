@@ -13,7 +13,12 @@ const imageSchema = mongoose.Schema(
         },
         fileName: {
             type: String,
-        }
+        },
+        resourceType: {
+            type: String,
+            required: true,
+            default: 'image',
+        },
     });
     
 const gallerySchema = mongoose.Schema(
