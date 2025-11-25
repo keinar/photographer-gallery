@@ -1,12 +1,10 @@
 const asyncHandler = require('express-async-handler');
 const Gallery = require('../models/galleryModel');
 const cloudinary = require('../config/cloudinary');
-const JSZip = require('jszip');
+const archiver = require('archiver'); 
 const axios = require('axios');
 
 // @desc Create new gallery item
-// @route POST /api/gallery
-// @access Private
 const createGallery = asyncHandler(async (req, res) => {
     const { title, clientName } = req.body;
     if (!title) {
@@ -22,8 +20,6 @@ const createGallery = asyncHandler(async (req, res) => {
 });
 
 // @desc Upload image to gallery
-// @route POST /api/gallery/:id/upload
-// @access Private
 const uploadImagesToGallery = asyncHandler(async (req, res) => {
     const gallery = await Gallery.findById(req.params.id);
 
@@ -41,6 +37,8 @@ const uploadImagesToGallery = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('No files were uploaded');
     }
+    
+    // Concurrent uploads to Cloudinary
     const uploadPromises = req.files.map(file => {
         const isVideo = file.mimetype.startsWith('video/');
         const resourceType = isVideo ? 'video' : 'auto';
@@ -57,12 +55,10 @@ const uploadImagesToGallery = asyncHandler(async (req, res) => {
         }))
         .catch(error => {
             console.error(`Error uploading ${file.originalname} to Cloudinary:`, error);
-            // Return null for failed uploads to continue with others
             return null; 
         });
     });
 
-    // Wait for all uploads to complete
     const uploadedImages = (await Promise.all(uploadPromises)).filter(result => result !== null);
     
     gallery.images.push(...uploadedImages);
@@ -75,22 +71,18 @@ const uploadImagesToGallery = asyncHandler(async (req, res) => {
 });
 
 // desc Get gallery by secret link
-// route GET /api/gallery/link/:secretLink
-// access Public
 const getGalleryBySecretLink = asyncHandler(async (req, res) => {
     const gallery = await Gallery.findOne({ secretLink: req.params.secretLink });
 
     if (!gallery) {
         res.status(404);
-        throw new Error('Gallery not found or invalid link  ');
+        throw new Error('Gallery not found or invalid link');
     }
 
     res.status(200).json(gallery);
 });
 
 // desc Delete gallery by ID
-// route DELETE /api/gallery/:id
-// access Private
 const deleteGalleryById = asyncHandler(async (req, res) => {
     const gallery = await Gallery.findById(req.params.id);
 
@@ -108,26 +100,22 @@ const deleteGalleryById = asyncHandler(async (req, res) => {
         const folderPath = `photographer_gallery/${gallery._id}`;
 
         try {
-            console.log(`Attempting to delete Cloudinary folder: ${folderPath}`);
             await cloudinary.api.delete_resources_by_prefix(folderPath);
             await cloudinary.api.delete_folder(folderPath);
-            console.log(`Cloudinary folder ${folderPath} deleted.`);
         } catch (error) {
             console.error('Error deleting images from Cloudinary:', error);
         }
     }
 
-        await Gallery.findByIdAndDelete(req.params.id);
+    await Gallery.findByIdAndDelete(req.params.id);
 
-        res.status(200).json({ 
-            message: 'Gallery and associated images deleted successfully',
-            id: req.params.id
-        });
+    res.status(200).json({ 
+        message: 'Gallery and associated images deleted successfully',
+        id: req.params.id
+    });
 });
 
 // @desc    Delete an image from a gallery
-// @route   DELETE /api/galleries/:galleryId/image
-// @access  Private
 const deleteImageFromGallery = asyncHandler(async (req, res) => {
   const { publicId } = req.body;
   const { galleryId } = req.params;
@@ -150,9 +138,7 @@ const deleteImageFromGallery = asyncHandler(async (req, res) => {
   }
 
   try {
-    console.log(`Attempting to delete image ${publicId} from Cloudinary...`);
     await cloudinary.uploader.destroy(publicId);
-    console.log('Image deleted from Cloudinary.');
   } catch (error) {
     console.error('Cloudinary image deletion failed:', error);
   }
@@ -168,10 +154,10 @@ const deleteImageFromGallery = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Download gallery as a ZIP file
-// @route   GET /api/galleries/public/:secretLink/download
-// @access  Public
+// @desc    Download gallery as a ZIP file (HEBREW SUPPORT FIX)
 const downloadGalleryAsZip = asyncHandler(async (req, res) => {
+  req.setTimeout(0); // Disable timeout for large downloads
+
   const gallery = await Gallery.findOne({ secretLink: req.params.secretLink });
 
   if (!gallery || gallery.images.length === 0) {
@@ -179,44 +165,65 @@ const downloadGalleryAsZip = asyncHandler(async (req, res) => {
     throw new Error('Gallery not found or has no images.');
   }
 
-  const zip = new JSZip();
+  // ✅ תיקון שמות בעברית:
+  // 1. מנקים תווים שאסורים במערכות קבצים (כמו / \ : * ? " < > |) אך משאירים עברית
+  const safeTitle = gallery.title.replace(/[\/\\:*?"<>|]/g, '_');
+  const filename = `${safeTitle}.zip`;
+  
+  // 2. מקודדים את השם ל-URL (עבור דפדפנים)
+  const encodedFilename = encodeURIComponent(filename);
 
-  await Promise.all(
-    gallery.images.map(async (image) => {
-      try {
-        const response = await axios.get(image.url, {
-          responseType: 'arraybuffer',
-        });
+  // 3. שימוש ב-filename* לתמיכה ב-UTF-8 (עברית) בדפדפנים מודרניים
+  res.setHeader('Content-Disposition', `attachment; filename="gallery.zip"; filename*=UTF-8''${encodedFilename}`);
+  res.setHeader('Content-Type', 'application/zip');
 
-        zip.file(image.fileName, response.data);
-      } catch (err) {
-        console.error(`Failed to fetch image ${image.url}:`, err.message);
-        zip.file(`FAILED_${image.fileName}.txt`, `Could not download image: ${image.url}`);
-      }
-    })
-  );
-
-  const fileName = `${gallery.title.replace(/ /g, '-') || 'gallery'}.zip`;
-
-  res.set({
-    'Content-Type': 'application/zip',
-    'Content-Disposition': `attachment; filename="${fileName}"`,
+  const archive = archiver('zip', {
+    zlib: { level: 5 }
   });
 
-  zip
-    .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
-    .pipe(res)
-    .on('finish', () => console.log('ZIP file sent successfully.'));
+  archive.pipe(res);
+
+  archive.on('error', (err) => {
+    console.error('Archiver Error:', err);
+    if (!res.headersSent) {
+        res.status(500).send({ error: err.message });
+    } else {
+        res.end(); 
+    }
+  });
+
+  // הורדה טורית (אחד אחרי השני) למניעת עומס זיכרון
+  for (const image of gallery.images) {
+    try {
+        const response = await axios({
+            url: image.url,
+            method: 'GET',
+            responseType: 'stream'
+        });
+
+        await new Promise((resolve, reject) => {
+            archive.append(response.data, { name: image.fileName });
+            response.data.on('end', resolve);
+            response.data.on('error', (err) => {
+                console.error(`Stream error for ${image.fileName}:`, err);
+                resolve(); // Continue to next file even if one fails
+            });
+        });
+
+    } catch (err) {
+        console.error(`Failed to fetch image ${image.url}:`, err.message);
+        archive.append(Buffer.from(`Error downloading: ${image.url}`), { name: `ERROR_${image.fileName}.txt` });
+    }
+  }
+
+  await archive.finalize();
 });
 
 // desc Get galleries for user
-// route GET /api/gallery
-// access Private
 const getGalleriesForUser = asyncHandler(async (req, res) => {
     const galleries = await Gallery.find({ user: req.user._id });
     res.status(200).json(galleries);
-}
-);
+});
 
 module.exports = {
   createGallery,
