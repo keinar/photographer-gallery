@@ -5,9 +5,11 @@ import { toast } from 'react-toastify';
 function ImageUploader({ galleryId, onUploadSuccess }) {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const handleFileChange = (e) => {
         setFiles(e.target.files);
+        setUploadProgress(0)
     };
 
     const handleSubmit = async (e) => {
@@ -32,6 +34,10 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
+                    },
+                    onUploadProgress: (progressEvent) => { 
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        setUploadProgress(percentCompleted);
                     },
                 }
             );
@@ -77,6 +83,17 @@ function ImageUploader({ galleryId, onUploadSuccess }) {
                     {loading ? 'Uploading...' : 'Upload'}
                 </button>
             </div>
+           {loading && uploadProgress > 0 && (
+                <div className="mt-2">
+                    <p className="text-sm text-blue-600 font-medium">Uploading: {uploadProgress}%</p>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div 
+                            className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" 
+                            style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                    </div>
+                </div>
+            )}
         </form>
     );
 }

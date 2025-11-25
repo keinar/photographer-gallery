@@ -41,28 +41,29 @@ const uploadImagesToGallery = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('No files were uploaded');
     }
-    const uploadedImages = [];
+    const uploadPromises = req.files.map(file => {
+        const isVideo = file.mimetype.startsWith('video/');
+        const resourceType = isVideo ? 'video' : 'auto';
 
-    for (const file of req.files) {
-        try {
-            const isVideo = file.mimetype.startsWith('video/');
-            const resourceType = isVideo ? 'video' : 'auto';
+        return cloudinary.uploader.upload(file.path, {
+            folder: `photographer_gallery/${gallery._id}`,
+            resource_type: resourceType,
+        })
+        .then(result => ({
+            url: result.secure_url,
+            public_id: result.public_id,
+            fileName: file.originalname,
+            resourceType: result.resource_type,
+        }))
+        .catch(error => {
+            console.error(`Error uploading ${file.originalname} to Cloudinary:`, error);
+            // Return null for failed uploads to continue with others
+            return null; 
+        });
+    });
 
-            const result = await cloudinary.uploader.upload(file.path, {
-                folder: `photographer_gallery/${gallery._id}`,
-                resource_type: resourceType,
-            });
-
-            uploadedImages.push({
-                url: result.secure_url,
-                public_id: result.public_id,
-                fileName: file.originalname,
-                resourceType: result.resource_type,
-            });
-        } catch (error) {
-            console.error('Error uploading to Cloudinary:', error);
-        }
-    }
+    // Wait for all uploads to complete
+    const uploadedImages = (await Promise.all(uploadPromises)).filter(result => result !== null);
     
     gallery.images.push(...uploadedImages);
     await gallery.save();

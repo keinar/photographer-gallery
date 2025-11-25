@@ -29,7 +29,7 @@ router.route('/:id')
 
 router
   .route('/:id/upload')
-  .post(protect, upload.array('images', 10), uploadImagesToGallery);
+  .post(protect, upload.array('images', 20), uploadImagesToGallery);
 
 router.route('/:galleryId/image')
   .delete(protect, deleteImageFromGallery);
