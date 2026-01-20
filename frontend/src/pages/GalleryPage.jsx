@@ -13,8 +13,25 @@ function GalleryPage() {
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Assuming relative path since frontend is served by backend
     const API_URL = '/api'; 
+
+    /**
+     * Helper to inject Cloudinary optimization transformations.
+     * f_auto: automatic format selection (WebP, AVIF, etc.)
+     * q_auto: automatic quality compression
+     */
+    const getOptimizedUrl = (url, resourceType, isThumbnail = false) => {
+        if (!url || !url.includes('cloudinary.com')) return url;
+
+        let transformations = 'f_auto,q_auto';
+        
+        // Add width limit for grid thumbnails to save more bandwidth
+        if (isThumbnail && resourceType === 'image') {
+            transformations += ',w_500,c_scale';
+        }
+
+        return url.replace('/upload/', `/upload/${transformations}/`);
+    };
 
     useEffect(() => {
         const fetchGallery = async () => {
@@ -36,13 +53,11 @@ function GalleryPage() {
 
     useEffect(() => {
         if (gallery && gallery.title) {
-            // Sets the tab title to "Gallery Name | Photographer Gallery"
             document.title = `${capitalizeFirstLetter(gallery.title)} | Photographer Gallery`;
         } else {
             document.title = 'Photographer Gallery';
         }
 
-        // Cleanup function to reset title when unmounting
         return () => {
             document.title = 'Photographer Gallery';
         };
@@ -123,15 +138,15 @@ function GalleryPage() {
               >
                 {image.resourceType === 'video' ? (
                     <video 
-                        src={image.url} 
+                        src={getOptimizedUrl(image.url, 'video', true)} 
                         className="w-full h-64 object-cover" 
-                        muted // Muted to allow autoplay on hover if desired, or just static
+                        muted 
                         onMouseOver={event => event.target.play()}
                         onMouseOut={event => event.target.pause()}
                     />
                 ) : (
                     <img 
-                        src={image.url} 
+                        src={getOptimizedUrl(image.url, 'image', true)} 
                         alt={image.fileName} 
                         loading="lazy"
                         className="w-full h-64 object-cover" 
@@ -160,17 +175,17 @@ function GalleryPage() {
               &times;
             </button>
 
-            {/* Media Content */}
+            {/* Media Content - High Quality optimized */}
             {selectedMedia.resourceType === 'video' ? (
               <video 
-                src={selectedMedia.url} 
+                src={getOptimizedUrl(selectedMedia.url, 'video')} 
                 controls 
                 autoPlay 
                 className="max-w-full max-h-[90vh] object-contain rounded shadow-2xl" 
               />
             ) : (
               <img 
-                src={selectedMedia.url} 
+                src={getOptimizedUrl(selectedMedia.url, 'image')} 
                 alt={selectedMedia.fileName} 
                 className="max-w-full max-h-[90vh] object-contain rounded shadow-2xl" 
               />
