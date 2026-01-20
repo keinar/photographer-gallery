@@ -16,6 +16,24 @@ function DashboardPage() {
   const [galleries, setGalleries] = useState([]);
   const [listLoading, setListLoading] = useState(true);
 
+  /**
+   * Helper to inject Cloudinary optimization transformations.
+   * f_auto: automatic format
+   * q_auto: automatic quality
+   * w_200: small width for dashboard thumbnails
+   */
+  const getOptimizedUrl = (url, resourceType, isThumbnail = false) => {
+    if (!url || !url.includes('cloudinary.com')) return url;
+
+    let transformations = 'f_auto,q_auto';
+    
+    if (isThumbnail && resourceType === 'image') {
+      transformations += ',w_200,c_scale';
+    }
+
+    return url.replace('/upload/', `/upload/${transformations}/`);
+  };
+
   const fetchGalleries = async () => {
     setListLoading(true);
     try {
@@ -44,7 +62,7 @@ function DashboardPage() {
     toast.dismiss();
 
     try {
-      const response = await api.post('/galleries', {
+      await api.post('/galleries', {
         title,
         clientName
       });
@@ -53,14 +71,11 @@ function DashboardPage() {
       setClientName('');
       fetchGalleries();
     } catch (err) {
-      console.error('Error creating gallery:', err.response.data);
-      // Check if this is a Zod validation error
+      console.error('Error creating gallery:', err.response?.data);
       if (err.response?.data?.errors) {
-        // Get the first error message from the Zod array
         const zodErrorMessage = err.response.data.errors[0].message;
         toast.error(zodErrorMessage);
       } else {
-        // Fallback for other types of errors
         const message = err.response?.data?.message || 'Failed to create gallery. Please try again.';
         toast.error(message);
       }
@@ -102,6 +117,7 @@ function DashboardPage() {
   };
 
   function capitalizeFirstLetter(string) {
+    if (!string) return '';
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
@@ -180,7 +196,7 @@ function DashboardPage() {
               {!listLoading && galleries.map((gallery) => (
                 <div key={gallery._id} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-xl font-semibold text-gray-900">{gallery.title}</h3>
+                    <h3 className="text-xl font-semibold text-gray-900">{capitalizeFirstLetter(gallery.title)}</h3>
                     <button
                       id={`deleteGalleryButton-${gallery._id}`}
                       onClick={() => handleDeleteGallery(gallery._id, gallery.title)}
@@ -190,7 +206,7 @@ function DashboardPage() {
                     </button>
                   </div>
                   <div className="text-sm text-gray-600 space-y-1">
-                    <p><span className="font-medium" id={`clientName-${gallery._id}`}>Client:</span> {gallery.clientName || 'N/A'}</p>
+                    <p><span className="font-medium" id={`clientName-${gallery._id}`}>Client:</span> {capitalizeFirstLetter(gallery.clientName) || 'N/A'}</p>
                     <p><span className="font-medium" id={`publicLink-${gallery._id}`}>Public Link:</span>
                       <a href={`/gallery/${gallery.secretLink}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
                         /gallery/{gallery.secretLink}
@@ -206,14 +222,14 @@ function DashboardPage() {
                           {image.resourceType === 'video' ? (
                             <video
                                 id={`media-${image._id}`}
-                                src={image.url}
+                                src={getOptimizedUrl(image.url, 'video', true)}
                                 controls
                                 className="w-full h-20 sm:h-24 object-cover rounded-md"
                             />
                           ) : (
                             <img
                                 id={`media-${image._id}`}
-                                src={image.url}
+                                src={getOptimizedUrl(image.url, 'image', true)}
                                 alt={image.fileName}
                                 className="w-full h-20 sm:h-24 object-cover rounded-md"
                             />
