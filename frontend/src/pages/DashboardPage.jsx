@@ -41,7 +41,7 @@ function DashboardPage() {
       setGalleries(response.data);
     } catch (err) {
       console.error('Error fetching galleries:', err);
-      toast.error('Failed to load galleries. Please try again.');
+      toast.error('Failed to load galleries! Please try again.');
     } finally {
       setListLoading(false);
     }
