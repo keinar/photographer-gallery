@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Add a request interceptor to include the token in headers
+// Add a request interceptor to include the token in headers 
 api.interceptors.request.use(
     (config) => {
         const user = JSON.parse(localStorage.getItem('user'));
